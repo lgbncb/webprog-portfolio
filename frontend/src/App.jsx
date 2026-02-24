@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import TiltedCard from "./TiltedCard";
 import LetterGlitch from "./LetterGlitch";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
+import ClickSpark from "./ClickSpark";
 
 // --- REPLACE WITH YOUR ACTUAL RENDER URL ---
 const API_URL = "https://webprog-portfolio.onrender.com/api/guestbook";
 
 /* ─────────────────────────────────────────────
-   CALIBRATED PERSONAL DATA
+    CALIBRATED PERSONAL DATA
 ───────────────────────────────────────────── */
 const PROJECTS = [
   {
@@ -94,7 +95,7 @@ const CONTACT_CARDS = [
 ];
 
 /* ─────────────────────────────────────────────
-   HELPERS
+    HELPERS
 ───────────────────────────────────────────── */
 function useScroll(ref) {
   const scroll = (dir) => {
@@ -104,7 +105,7 @@ function useScroll(ref) {
 }
 
 /* ─────────────────────────────────────────────
-   COMPONENTS
+    COMPONENTS
 ───────────────────────────────────────────── */
 function CarouselRow({ title, items, onProjectClick }) {
   const ref = useRef(null);
@@ -156,6 +157,42 @@ function CarouselRow({ title, items, onProjectClick }) {
   );
 }
 
+function FadeInSection({ children, className = "", delayMs = 0 }) {
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -10% 0px",
+      }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={sectionRef}
+      style={{ transitionDelay: `${delayMs}ms` }}
+      className={`${className} transition-all duration-700 ease-out will-change-transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function App() {
   const [messages, setMessages] = useState([]);
   const [newName, setNewName] = useState("");
@@ -167,28 +204,54 @@ export default function App() {
   const fetchMessages = async () => {
     try {
       const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("Failed to fetch messages");
       const data = await res.json();
       setMessages(Array.isArray(data) ? data : []);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error("Fetch error:", e); 
+      setMessages([]); // Fallback to empty list
+    }
   };
 
   useEffect(() => { fetchMessages(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!newName.trim() || !newMessage.trim()) return;
+    
     setIsSubmitting(true);
     try {
-      await fetch(API_URL, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newName, message: newMessage }),
       });
-      setNewName(""); setNewMessage(""); fetchMessages();
-    } finally { setIsSubmitting(false); }
+
+      if (response.ok) {
+        setNewName(""); 
+        setNewMessage(""); 
+        // Refresh the list immediately after a successful post
+        await fetchMessages();
+      } else {
+        const errData = await response.json();
+        console.error("Post error:", errData.message);
+      }
+    } catch (e) { 
+      console.error("Network error:", e); 
+    } finally { 
+      setIsSubmitting(false); 
+    }
   };
 
   if (currentPage === "contact") {
     return (
+      <ClickSpark
+        sparkColor="#fff"
+        sparkSize={10}
+        sparkRadius={15}
+        sparkCount={8}
+        duration={400}
+      >
       <div className="bg-[#141414] text-white min-h-screen font-sans selection:bg-[#e50914]">
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
@@ -227,10 +290,18 @@ export default function App() {
           </div>
         </section>
       </div>
+      </ClickSpark>
     );
   }
 
   return (
+    <ClickSpark
+      sparkColor="#fff"
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
     <div className="bg-[#141414] text-white min-h-screen font-sans selection:bg-[#e50914]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
@@ -279,24 +350,28 @@ export default function App() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 px-[4%] bg-[#141414]">
-        <div className="max-w-4xl border-l-4 border-[#e50914] pl-8">
-          <h2 className="font-bebas text-5xl mb-6">About the <span className="text-[#e50914]">Developer</span></h2>
-          <p className="text-gray-400 leading-relaxed mb-6">
-            A tech and aviation geek based in Taguig. Pursuing a BS in Computer Science with a specialization in Cybersecurity and Forensics. 
-            When not coding, you'll find me at the drum kit or riding through the city in my bike. I love exploring new things and am always up for a challenge. This portfolio is a glimpse into my world of projects, skills, and passions. Thanks for stopping by!
-            I love watching Kdrama and Historical documentaries which inspire me to create and learn more about the world. I'm passionate about cybersecurity and hope to make a positive impact in the field. Feel free to reach out or check out my projects below!
-            My motto in life is "Stay curious, stay humble, and keep pushing forward." I believe that with hard work and determination, anything is possible. I'm excited to share my journey and projects with you through this portfolio. Let's connect and create something amazing together!
-          </p>
-        </div>
-      </section>
+      <FadeInSection>
+        {/* About Section */}
+        <section id="about" className="py-20 px-[4%] bg-[#141414]">
+          <div className="max-w-4xl border-l-4 border-[#e50914] pl-8">
+            <h2 className="font-bebas text-5xl mb-6">About the <span className="text-[#e50914]">Developer</span></h2>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              A tech and aviation geek based in Taguig. Pursuing a BS in Computer Science with a specialization in Cybersecurity and Forensics. 
+              When not coding, you'll find me at the drum kit or riding through the city in my bike. I love exploring new things and am always up for a challenge. This portfolio is a glimpse into my world of projects, skills, and passions. Thanks for stopping by!
+              I love watching Kdrama and Historical documentaries which inspire me to create and learn more about the world. I'm passionate about cybersecurity and hope to make a positive impact in the field. Feel free to reach out or check out my projects below!
+              My motto in life is "Stay curious, stay humble, and keep pushing forward." I believe that with hard work and determination, anything is possible. I'm excited to share my journey and projects with you through this portfolio. Let's connect and create something amazing together!
+            </p>
+          </div>
+        </section>
+      </FadeInSection>
 
-      {/* Content Rows */}
-      <div className="relative z-30 pt-8 md:pt-10">
-        <CarouselRow title="Featured Works" items={PROJECTS} onProjectClick={setSelectedProject} />
-        {SKILL_ROWS.map(row => <CarouselRow key={row.label} title={row.label} items={row.items} />)}
-      </div>
+      <FadeInSection delayMs={100}>
+        {/* Content Rows */}
+        <div className="relative z-30 pt-8 md:pt-10">
+          <CarouselRow title="Featured Works" items={PROJECTS} onProjectClick={setSelectedProject} />
+          {SKILL_ROWS.map(row => <CarouselRow key={row.label} title={row.label} items={row.items} />)}
+        </div>
+      </FadeInSection>
 
       {selectedProject && (
         <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center px-4" onClick={() => setSelectedProject(null)}>
@@ -332,29 +407,61 @@ export default function App() {
         </div>
       )}
 
-      {/* Guestbook */}
-      <section id="guestbook" className="py-20 px-[4%] bg-black">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-bebas text-5xl mb-10 text-center uppercase tracking-widest">Guestbook <span className="text-[#e50914]">Reviews</span></h2>
-          <form onSubmit={handleSubmit} className="mb-12 bg-[#181818] p-8 rounded-lg border border-gray-800 shadow-2xl">
-            <input value={newName} onChange={e => setNewName(e.target.value)} className="w-full bg-[#2a2a2a] p-4 mb-4 rounded border border-gray-700 outline-none focus:border-[#e50914] text-white" placeholder="Full Name" required />
-            <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} className="w-full bg-[#2a2a2a] p-4 mb-6 rounded border border-gray-700 outline-none focus:border-[#e50914] text-white h-32 resize-none" placeholder="Leave a review..." required />
-            <button type="submit" className="w-full bg-[#e50914] py-4 font-bold uppercase tracking-[0.2em] hover:bg-[#b90812] transition">{isSubmitting ? 'Posting...' : 'Post Review'}</button>
-          </form>
-          <div className="grid gap-4 md:grid-cols-2">
-            {messages.map(m => (
-              <div key={m.id} className="bg-[#181818] p-6 rounded border-l-2 border-[#e50914] hover:bg-[#222] transition">
-                <div className="font-bold text-[#e50914] mb-2">{m.name}</div>
-                <div className="text-gray-400 text-sm italic">"{m.message}"</div>
-              </div>
-            ))}
+      <FadeInSection delayMs={150}>
+        {/* Guestbook Section */}
+        <section id="guestbook" className="py-20 px-[4%] bg-black">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="font-bebas text-5xl mb-10 text-center uppercase tracking-widest">Guestbook <span className="text-[#e50914]">Reviews</span></h2>
+            <form onSubmit={handleSubmit} className="mb-12 bg-[#181818] p-8 rounded-lg border border-gray-800 shadow-2xl">
+              <input 
+                value={newName} 
+                onChange={e => setNewName(e.target.value)} 
+                className="w-full bg-[#2a2a2a] p-4 mb-4 rounded border border-gray-700 outline-none focus:border-[#e50914] text-white" 
+                placeholder="Full Name" 
+                required 
+              />
+              <textarea 
+                value={newMessage} 
+                onChange={e => setNewMessage(e.target.value)} 
+                className="w-full bg-[#2a2a2a] p-4 mb-6 rounded border border-gray-700 outline-none focus:border-[#e50914] text-white h-32 resize-none" 
+                placeholder="Leave a review..." 
+                required 
+              />
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-[#e50914] py-4 font-bold uppercase tracking-[0.2em] hover:bg-[#b90812] transition disabled:opacity-50"
+              >
+                {isSubmitting ? 'Posting...' : 'Post Review'}
+              </button>
+            </form>
+            
+            {/* Guestbook Review List */}
+            <div className="grid gap-4 md:grid-cols-2 max-h-[600px] overflow-y-auto no-scrollbar px-1">
+              {messages.length === 0 ? (
+                <p className="text-gray-500 italic col-span-2 text-center">No reviews yet. Be the first to post!</p>
+              ) : (
+                messages.map(m => (
+                  <div key={m.id} className="bg-[#181818] p-6 rounded border-l-2 border-[#e50914] hover:bg-[#222] transition shadow-md">
+                    <div className="font-bold text-[#e50914] mb-2">{m.name}</div>
+                    <div className="text-gray-400 text-sm italic leading-relaxed">"{m.message}"</div>
+                    <div className="text-[10px] text-gray-600 mt-4 uppercase">
+                      {m.created_at ? new Date(m.created_at).toLocaleDateString() : 'Just now'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
-      <footer className="py-12 text-center text-gray-700 text-xs uppercase tracking-[0.3em] border-t border-gray-900">
-        LanCe Gabriel M. Buncab · Asia Pacific College · 2026
-      </footer>
+      <FadeInSection delayMs={200}>
+        <footer className="py-12 text-center text-gray-700 text-xs uppercase tracking-[0.3em] border-t border-gray-900">
+          LanCe Gabriel M. Buncab · WEBPROG FINALS · 2026
+        </footer>
+      </FadeInSection>
     </div>
+    </ClickSpark>
   );
 }
