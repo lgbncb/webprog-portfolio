@@ -549,7 +549,7 @@ export default function App() {
 
       <FadeInSection delayMs={200}>
         <footer className="py-12 text-center text-gray-700 text-xs uppercase tracking-[0.3em] border-t border-gray-900">
-          LanCe Gabriel M. Buncab · WEBPROG FINALS · 2026
+          Lance Gabriel M. Buncab · WEBPROG FINALS · 2026
         </footer>
       </FadeInSection>
     </div>
