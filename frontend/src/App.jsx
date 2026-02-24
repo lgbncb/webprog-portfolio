@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // --- CONFIGURE YOUR URL HERE ---
-const API_URL = 'https://humble-fishstick-x5v9wq754xp7cpvvp-3000.app.github.dev/api/guestbook';
+const API_URL = 'https://webprog-portfolio.onrender.com/api/guestbook';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -61,7 +61,7 @@ function App() {
       {/* Hero */}
       <section id="about" className="relative h-screen flex flex-col justify-center px-8 md:px-24 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(to bottom, rgba(26,18,11,0.7), rgba(26,18,11,0.95)), url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&q=80')" }}>
         <div className="max-w-4xl z-10 mt-16 text-left">
-          <p className="text-orange-400 font-mono text-lg mb-5">Hello, I am</p>
+          <p className="text-orange-400 font-mono text-lg mb-5">Hello, I am Lance Gabriel M. Buncab</p>
           <h1 className="text-6xl md:text-8xl font-extrabold mb-2 text-[#f4e4c1] tracking-tight">Lanz Buncab.</h1>
           <h2 className="text-4xl md:text-6xl font-bold text-gray-400 mb-8 tracking-tight">I design and code amazing things.</h2>
           <p className="text-gray-300 text-lg md:text-xl mb-12 max-w-2xl leading-relaxed">
