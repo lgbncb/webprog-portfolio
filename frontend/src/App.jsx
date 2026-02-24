@@ -226,6 +226,7 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [currentPage, setCurrentPage] = useState("home");
+  const [toast, setToast] = useState({ show: false, message: "" });
 
   const fetchMessages = async () => {
     try {
@@ -258,7 +259,10 @@ export default function App() {
         setNewMessage(""); 
         // Refresh the list immediately after a successful post
         await fetchMessages();
-      } else {
+        setToast({ show: true, message: "Review posted successfully! 🚀" });
+  setTimeout(() => setToast({ show: false, message: "" }), 3000);
+      } else       
+       {
         const errData = await response.json();
         console.error("Post error:", errData.message);
       }
@@ -315,6 +319,17 @@ export default function App() {
             </ScrollStack>
           </div>
         </section>
+        <div 
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 ${
+          toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
+        }`}
+      >
+        <div className="bg-[#181818] border-l-4 border-[#e50914] text-white px-6 py-3 rounded shadow-2xl flex items-center gap-3 min-w-[300px]">
+          <span className="text-[#e50914] font-bold">✓</span>
+          <span className="text-sm font-medium tracking-wide uppercase">{toast.message}</span>
+        </div>
+      </div>
+      
       </div>
       </ClickSpark>
     );
