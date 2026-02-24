@@ -298,7 +298,7 @@ export default function App() {
         <section className="px-[4%] pt-28 pb-20">
           <div className="max-w-3xl mx-auto mb-10">
             <h1 className="font-bebas text-6xl md:text-7xl tracking-wider mb-3">Contact Me</h1>
-            <p className="text-gray-400">Click a card to open my profile.</p>
+            <p className="text-gray-400">Visit my Profile.</p>
           </div>
 
           <div className="max-w-3xl mx-auto">
@@ -379,14 +379,58 @@ export default function App() {
       <FadeInSection>
         {/* About Section */}
         <section id="about" className="py-20 px-[4%] bg-[#141414]">
-          <div className="max-w-4xl border-l-4 border-[#e50914] pl-8">
-            <h2 className="font-bebas text-5xl mb-6">About the <span className="text-[#e50914]">Developer</span></h2>
-            <p className="text-gray-400 leading-relaxed mb-6">
-              A tech and aviation geek based in Taguig. Pursuing a BS in Computer Science with a specialization in Cybersecurity and Forensics. 
-              When not coding, you'll find me at the drum kit or riding through the city in my bike. I love exploring new things and am always up for a challenge. This portfolio is a glimpse into my world of projects, skills, and passions. Thanks for stopping by!
-              I love watching Kdrama and Historical documentaries which inspire me to create and learn more about the world. I'm passionate about cybersecurity and hope to make a positive impact in the field. Feel free to reach out or check out my projects below!
-              My motto in life is "Stay curious, stay humble, and keep pushing forward." I believe that with hard work and determination, anything is possible. I'm excited to share my journey and projects with you through this portfolio. Let's connect and create something amazing together!
-            </p>
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-14 items-start">
+            <div className="relative rounded-md border border-red-900/50 bg-gradient-to-b from-red-950/40 to-[#121212] min-h-[430px] overflow-hidden">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#e50914] px-4 py-1 text-xs font-bold tracking-wider">N PROFILE</div>
+              <div className="h-full flex flex-col items-center justify-center text-center px-6">
+                <img
+                  src="/images/profile.jpg"
+                  alt="Lance Buncab"
+                  className="w-full max-w-[320px] h-[320px] object-cover rounded-md border border-gray-700 shadow-2xl"
+                />
+                <p className="text-gray-300 text-sm max-w-[260px] mt-4">Hi I'm Lance, you can call me Gab.</p>
+              </div>
+            </div>
+
+            <div className="pt-1">
+              <p className="text-[#e50914] text-xs tracking-[0.25em] mb-4 uppercase">01 · About Me</p>
+              <h2 className="font-bebas text-6xl leading-[0.9] text-white">WHO IS<br /><span className="text-[#e50914]">LANCE?</span></h2>
+
+              <p className="text-gray-300 leading-relaxed mt-8">
+                I'm a Computer Science student passionate about building things that live on the internet. Currently pursuing my degree and turning coursework into real, deployed projects.
+              </p>
+              <p className="text-gray-300 leading-relaxed mt-5">
+                I specialize in web development and cybersecurity, and I enjoy creating experiences that are functional, clean, and fast.
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 mt-8 max-w-md">
+                <div className="border border-gray-700 rounded px-3 py-3 text-center bg-[#1a1a1a]">
+                  <div className="text-[#e50914] font-bold text-3xl leading-none">20</div>
+                  <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Years Old</div>
+                </div>
+                <div className="border border-gray-700 rounded px-3 py-3 text-center bg-[#1a1a1a]">
+                  <div className="text-[#e50914] font-bold text-3xl leading-none">5</div>
+                  <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Countries Visited</div>
+                </div>
+                <div className="border border-gray-700 rounded px-3 py-3 text-center bg-[#1a1a1a]">
+                  <div className="text-[#e50914] font-bold text-3xl leading-none">5</div>
+                  <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Interests</div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-6">
+                {[
+                  "🎮 Gaming",
+                  "📚 Reading",
+                  "🎵 Music",
+                  "☕ Coffee",
+                  "🚀 Aviation",
+                  "🎨 Design",
+                ].map((chip) => (
+                  <span key={chip} className="text-xs px-3 py-1.5 rounded border border-gray-700 bg-[#1a1a1a] text-gray-300">{chip}</span>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </FadeInSection>
