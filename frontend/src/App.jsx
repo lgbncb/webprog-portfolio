@@ -107,10 +107,12 @@ function useScroll(ref) {
 /* ─────────────────────────────────────────────
     COMPONENTS
 ───────────────────────────────────────────── */
-function CarouselRow({ title, items, onProjectClick }) {
+function CarouselRow({ title, items, onProjectClick, onMediaView }) {
   const ref = useRef(null);
   const scroll = useScroll(ref);
   const isFeatured = title === "Featured Works";
+  const isImageRow = title === "Programming" || title === "Gallery" || title === "Hobbies";
+  const isViewRow = title === "Gallery" || title === "Hobbies";
 
   return (
     <div className="mb-10 px-[4%]">
@@ -124,7 +126,8 @@ function CarouselRow({ title, items, onProjectClick }) {
 
             return (
             <div key={key} className="flex-shrink-0 w-64 z-0 hover:z-20">
-              {isFeatured && itemData.img ? (
+              {(isFeatured || isImageRow) && itemData.img ? (
+                <div className="rounded-md overflow-hidden border border-gray-800 bg-[#1b1b1b]">
                 <TiltedCard
                   imageSrc={itemData.img}
                   altText={itemData.title}
@@ -136,11 +139,33 @@ function CarouselRow({ title, items, onProjectClick }) {
                   rotateAmplitude={12}
                   scaleOnHover={1.05}
                   showMobileWarning={false}
-                  showTooltip
+                  showTooltip={isFeatured}
                   displayOverlayContent
-                  onClick={() => onProjectClick?.(itemData)}
+                  onClick={isFeatured ? () => onProjectClick?.(itemData) : undefined}
                   overlayContent={<p className="text-xs font-bold">{itemData.title}</p>}
                 />
+                {!isFeatured && (
+                  <div className="px-3 py-3 border-t border-gray-800">
+                    <div className="font-bold text-white text-base leading-tight">{itemData.title}</div>
+                    <div className="text-emerald-400 text-[11px] mt-1">{title} · Portfolio · 2026</div>
+                    <div className="flex gap-1 mt-2">
+                      <span className="text-[10px] bg-[#2a2a2a] px-2 py-0.5 text-gray-300">{title}</span>
+                      <span className="text-[10px] bg-[#2a2a2a] px-2 py-0.5 text-gray-300">Creative</span>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => isViewRow && onMediaView?.({ ...itemData, category: title })}
+                        className="bg-white text-black text-xs font-bold px-3 py-1 rounded w-[112px]"
+                      >
+                        ▶ {isViewRow ? "View" : "Demo"}
+                      </button>
+                      <button type="button" className="w-7 h-7 rounded-full border border-gray-500 text-xs text-gray-300">↻</button>
+                      <button type="button" className="w-7 h-7 rounded-full border border-gray-500 text-xs text-gray-300">◍</button>
+                    </div>
+                  </div>
+                )}
+                </div>
               ) : (
                 <div className="h-36 bg-gray-800 rounded-md overflow-hidden relative">
                   {itemData.img ? <img src={itemData.img} className="w-full h-full object-cover opacity-80" /> : <div className="w-full h-full flex items-center justify-center bg-[#2a2a2a] text-gray-500">{itemData.title}</div>}
@@ -199,6 +224,7 @@ export default function App() {
   const [newMessage, setNewMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedMedia, setSelectedMedia] = useState(null);
   const [currentPage, setCurrentPage] = useState("home");
 
   const fetchMessages = async () => {
@@ -369,9 +395,30 @@ export default function App() {
         {/* Content Rows */}
         <div className="relative z-30 pt-8 md:pt-10">
           <CarouselRow title="Featured Works" items={PROJECTS} onProjectClick={setSelectedProject} />
-          {SKILL_ROWS.map(row => <CarouselRow key={row.label} title={row.label} items={row.items} />)}
+          {SKILL_ROWS.map(row => <CarouselRow key={row.label} title={row.label} items={row.items} onMediaView={setSelectedMedia} />)}
         </div>
       </FadeInSection>
+
+      {selectedMedia && (
+        <div className="fixed inset-0 z-[110] bg-black/85 flex items-center justify-center px-4" onClick={() => setSelectedMedia(null)}>
+          <div className="w-full max-w-3xl bg-[#181818] border border-gray-700 rounded-lg p-4 md:p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bebas text-4xl tracking-wide text-white leading-none">{selectedMedia.title}</h3>
+                <p className="text-emerald-400 text-xs mt-1">{selectedMedia.category} · Hover image to zoom</p>
+              </div>
+              <button type="button" className="text-gray-300 hover:text-white" onClick={() => setSelectedMedia(null)}>Close</button>
+            </div>
+            <div className="rounded-md overflow-hidden border border-gray-700 bg-black">
+              <img
+                src={selectedMedia.img}
+                alt={selectedMedia.title}
+                className="w-full h-[52vh] object-cover transition-transform duration-500 hover:scale-110"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedProject && (
         <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center px-4" onClick={() => setSelectedProject(null)}>
