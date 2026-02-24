@@ -113,6 +113,7 @@ function CarouselRow({ title, items, onProjectClick, onMediaView }) {
   const scroll = useScroll(ref);
   const isFeatured = title === "Featured Works";
   const isImageRow = title === "Programming" || title === "Gallery" || title === "Hobbies";
+  const isProgrammingRow = title === "Programming";
   const isViewRow = title === "Gallery" || title === "Hobbies";
 
   return (
@@ -156,10 +157,16 @@ function CarouselRow({ title, items, onProjectClick, onMediaView }) {
                     <div className="mt-3 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => isViewRow && onMediaView?.({ ...itemData, category: title })}
+                        onClick={() => {
+                          if (isProgrammingRow) {
+                            window.open("https://www.w3schools.com/", "_blank", "noopener,noreferrer");
+                            return;
+                          }
+                          if (isViewRow) onMediaView?.({ ...itemData, category: title });
+                        }}
                         className="bg-white text-black text-xs font-bold px-3 py-1 rounded w-[112px]"
                       >
-                        ▶ {isViewRow ? "View" : "Demo"}
+                        ▶ {isViewRow ? "View" : isProgrammingRow ? "Learn" : "Demo"}
                       </button>
                       <button type="button" className="w-7 h-7 rounded-full border border-gray-500 text-xs text-gray-300">↻</button>
                       <button type="button" className="w-7 h-7 rounded-full border border-gray-500 text-xs text-gray-300">◍</button>
@@ -229,6 +236,19 @@ export default function App() {
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [currentPage, setCurrentPage] = useState("home");
   const [toast, setToast] = useState({ show: false, message: "" });
+  const toastTimeoutRef = useRef(null);
+
+  const showToast = (message, duration = 3000) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+
+    setToast({ show: true, message });
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast({ show: false, message: "" });
+      toastTimeoutRef.current = null;
+    }, duration);
+  };
 
   const fetchMessages = async () => {
     try {
@@ -243,6 +263,14 @@ export default function App() {
   };
 
   useEffect(() => { fetchMessages(); }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -259,16 +287,16 @@ export default function App() {
       if (response.ok) {
         setNewName(""); 
         setNewMessage(""); 
-        // Refresh the list immediately after a successful post
-        await fetchMessages();
-        setToast({ show: true, message: "Review posted successfully! 🚀" });
-        setTimeout(() => setToast({ show: false, message: "" }), 3000);
+        showToast("Review posted successfully! 🚀");
+        fetchMessages();
       } else {
-        const errData = await response.json();
-        console.error("Post error:", errData.message);
+        const errData = await response.json().catch(() => null);
+        console.error("Post error:", errData?.message || "Failed to post review");
+        showToast("Failed to post review. Please try again.");
       }
     } catch (e) { 
       console.error("Network error:", e); 
+      showToast("Network error. Please try again.");
     } finally { 
       setIsSubmitting(false); 
     }
@@ -328,7 +356,7 @@ export default function App() {
         
         {/* Contact Page Toast Notification */}
         <div 
-        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 ${
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[1200] transition-all duration-500 ${
           toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
         }`}
       >
@@ -384,7 +412,7 @@ export default function App() {
             <span className="bg-[#e50914] text-white text-[10px] font-bold px-1 py-0.5 rounded-sm">O</span>
             <span className="text-gray-400 text-xs font-bold tracking-[0.3em] uppercase">Cybersecurity & Forensics</span>
           </div>
-          <h1 className="font-bebas text-7xl md:text-9xl leading-[0.85] mb-4 uppercase">LANCE<br/><span className="text-[#e50914]">BUNCAB</span></h1>
+          <h1 className="font-bebas text-7xl md:text-9xl leading-[0.85] mb-4 uppercase">LANCE GABRIEL<br/><span className="text-[#e50914]">BUNCAB</span></h1>
           <p className="text-lg text-gray-300 mb-8 max-w-lg">Second-year CS student at Asia Pacific College. </p>
           <div className="flex gap-4">
             <button
@@ -394,7 +422,13 @@ export default function App() {
             >
               Contact Me
             </button>
-            <button className="bg-gray-500/50 text-white px-8 py-2.5 font-bold backdrop-blur-md hover:bg-gray-500/30 transition">ⓘ More Info</button>
+            <button
+              type="button"
+              onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="bg-gray-500/50 text-white px-8 py-2.5 font-bold backdrop-blur-md hover:bg-gray-500/30 transition"
+            >
+              ⓘ More Info
+            </button>
           </div>
         </div>
       </section>
@@ -436,8 +470,8 @@ export default function App() {
                   <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Countries Visited</div>
                 </div>
                 <div className="border border-gray-700 rounded px-3 py-3 text-center bg-[#1a1a1a]">
-                  <div className="text-[#e50914] font-bold text-3xl leading-none">5</div>
-                  <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Interests</div>
+                  <div className="text-[#e50914] font-bold text-3xl leading-none">20+</div>
+                  <div className="text-gray-400 text-[10px] mt-1 tracking-[0.2em] uppercase">Local Cities Visited</div>
                 </div>
               </div>
 
@@ -578,7 +612,7 @@ export default function App() {
       
       {/* Main Page Toast Notification */}
       <div 
-        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 ${
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[1200] transition-all duration-500 ${
           toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
         }`}
       >

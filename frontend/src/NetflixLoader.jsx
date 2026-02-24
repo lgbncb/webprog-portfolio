@@ -25,16 +25,16 @@ export default function NetflixLoader({ onComplete }) {
 
   useEffect(() => {
     setTimeout(() => { setShowN(true); setNOpacity(1); setNScale(1); }, 100);
-    setTimeout(() => setPhase("bars"), 800);
-    setTimeout(() => { setBarsDone(true); setPhase("reveal"); }, 4200);
-    setTimeout(() => setFadeOut(true), 4700);
-    setTimeout(() => { setPhase("done"); onComplete?.(); }, 5000);
+    setTimeout(() => setPhase("bars"), 500);
+    setTimeout(() => { setBarsDone(true); setPhase("reveal"); }, 2500);
+    setTimeout(() => setFadeOut(true), 2800);
+    setTimeout(() => { setPhase("done"); onComplete?.(); }, 3000);
   }, [onComplete]);
 
   useEffect(() => {
     if (phase !== "bars") return;
     const start = Date.now();
-    const duration = 3400;
+    const duration = 2000;
     const raf = requestAnimationFrame(function tick() {
       const elapsed = Date.now() - start;
       const pct = Math.min((elapsed / duration) * 100, 100);
