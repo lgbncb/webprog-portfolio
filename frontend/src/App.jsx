@@ -3,6 +3,7 @@ import TiltedCard from "./TiltedCard";
 import LetterGlitch from "./LetterGlitch";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 import ClickSpark from "./ClickSpark";
+import NetflixLoader from "./NetflixLoader";
 
 // --- REPLACE WITH YOUR ACTUAL RENDER URL ---
 const API_URL = "https://webprog-portfolio.onrender.com/api/guestbook";
@@ -219,6 +220,7 @@ function FadeInSection({ children, className = "", delayMs = 0 }) {
 }
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true); // Added loader state
   const [messages, setMessages] = useState([]);
   const [newName, setNewName] = useState("");
   const [newMessage, setNewMessage] = useState("");
@@ -260,9 +262,8 @@ export default function App() {
         // Refresh the list immediately after a successful post
         await fetchMessages();
         setToast({ show: true, message: "Review posted successfully! 🚀" });
-  setTimeout(() => setToast({ show: false, message: "" }), 3000);
-      } else       
-       {
+        setTimeout(() => setToast({ show: false, message: "" }), 3000);
+      } else {
         const errData = await response.json();
         console.error("Post error:", errData.message);
       }
@@ -272,6 +273,11 @@ export default function App() {
       setIsSubmitting(false); 
     }
   };
+
+  // Render Loader if it's the initial page load
+  if (isLoading) {
+    return <NetflixLoader onComplete={() => setIsLoading(false)} />;
+  }
 
   if (currentPage === "contact") {
     return (
@@ -319,6 +325,8 @@ export default function App() {
             </ScrollStack>
           </div>
         </section>
+        
+        {/* Contact Page Toast Notification */}
         <div 
         className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 ${
           toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
@@ -329,7 +337,7 @@ export default function App() {
           <span className="text-sm font-medium tracking-wide uppercase">{toast.message}</span>
         </div>
       </div>
-      
+
       </div>
       </ClickSpark>
     );
@@ -567,6 +575,19 @@ export default function App() {
           Lance Gabriel M. Buncab · WEBPROG FINALS · 2026
         </footer>
       </FadeInSection>
+      
+      {/* Main Page Toast Notification */}
+      <div 
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 ${
+          toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
+        }`}
+      >
+        <div className="bg-[#181818] border-l-4 border-[#e50914] text-white px-6 py-3 rounded shadow-2xl flex items-center gap-3 min-w-[300px]">
+          <span className="text-[#e50914] font-bold">✓</span>
+          <span className="text-sm font-medium tracking-wide uppercase">{toast.message}</span>
+        </div>
+      </div>
+
     </div>
     </ClickSpark>
   );
