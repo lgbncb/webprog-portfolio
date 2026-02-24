@@ -1,0 +1,24 @@
+{
+  "name": "webprog-portfolio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgbncb/webprog-portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lgbncb/webprog-portfolio/issues"
+  },
+  "homepage": "https://github.com/lgbncb/webprog-portfolio#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
